@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+  <h2>Naver Clova</h2>
+
+  <form>
+    <input type="file" name="file" accept="image/*">
+    <input type="button" value="판독요청">
+  </form>
+
+  <h3>OCR 결과</h3>
+  <div id="result">판독 전 입니다.</div>
+
+
+  <script>
+    document.getElementById('ocr-btn').addEventListener('click', (e) => {
+      // multipart/form-data 비동기 요청
+      let formData = new FormData(document.getElementById('ocr-form'));
+
+      fetch('[[@{/upload}]', {
+        method: 'POST',
+        body: formData
+      })
+
+
+
+    })
+  </script>
+</body>
+</html>
