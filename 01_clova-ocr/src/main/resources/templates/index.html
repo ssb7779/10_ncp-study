@@ -5,26 +5,65 @@
   <title>Title</title>
 </head>
 <body>
-  <h2>Naver Clova</h2>
+  <h2>Naver Clova OCR</h2>
 
-  <form>
-    <input type="file" name="file" accept="image/*">
-    <input type="button" value="판독요청">
+  <form id="ocr-form">
+    <select name="type">
+      <option value="general">일반</option>
+      <option value="template">템플릿</option>
+    </select>
+    <input type="file" name="file" accept="image/*" required>
+    <input type="button" value="판독요청" id="ocr-btn">
   </form>
 
   <h3>OCR 결과</h3>
   <div id="result">판독 전 입니다.</div>
 
+<!--
+          multipart/form-data            multipart/form-data
+              type, file         저장           file
+  client <=====================>  app  <========================> NCP OCR API
+               text                             text
+-->
 
   <script>
     document.getElementById('ocr-btn').addEventListener('click', (e) => {
       // multipart/form-data 비동기 요청
       let formData = new FormData(document.getElementById('ocr-form'));
 
-      fetch('[[@{/upload}]', {
+      fetch( '[[@{/upload}]]', {
         method: 'POST',
         body: formData
       })
+        .then(response => response.json())
+        .then(data => {
+
+          const {message, result} = data;
+
+          // JSON.parse(result).images[0].fields => 배열
+          console.log(JSON.parse(result));
+
+          const ocrResult = JSON.parse(result).images[0].fields;
+
+
+          if(formData.get('type') === 'general') {
+            document.getElementById('result').innerHTML
+              = ocrResult.map(obj => `<p>${obj.inferText}</p>`).join('');
+          }else {
+            // ocrResult == [{name:xxx, inferText:xxx}, {}, ..]
+            document.getElementById('result').innerHTML
+              = '<table border="1">'
+              +   ocrResult.map(obj => `<tr><th>${obj.name}</th><td>${obj.inferText}</td></tr>`).join('')
+              + '<table>';
+          }
+
+          alert(message);
+
+
+
+        })
+
+
 
 
 
